@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<meta charset="UTF-8">
+        <title>Fcc Form</title>
+    </head>
+    <body>
+		<h1 id="title"> un formulario</h1>
+		<p id="description"> esto es un formulario</p>
+		<form id="survey-form">
+			<label for="name" id="name-label">Nombre</label>
+			<input type="text" id="name" placeholder="el nombre" required>
+			<label for="email" id="email-label">Email</label>
+			<input type="email" id="email" placeholder="El email" required>
+			<label id="number-label" for="number">Numero</label>
+			<input type="number" id="number" max=1000 min=300 placeholder="min:300 max:1000" required>
+			<select id="dropdown" name="role" required>
+				<option disabled selected value>Seleccionar algo</option>
+				<option value="una" >una</option>
+				<option value="ana">ana</option>
+				<option value="bna">bna</option>
+				<option value="cna">cna</option>
+				<option value="dna">dna</option>
+				<option value="ena">ena</option>
+				<option value="fna">fna</option>
+				<option value="gna">gna</option>
+			</select>
+			<label> <input name="blood-type" value="A" type="radio" checked>A+</label>
+<label> <input name="blood-type" value="B" type="radio">B+</label>
+<label> <input name="blood-type" value="AB" type="radio">AB</label>
+<label> <input name="blood-type" value="O" type="radio">O</label>
+<br>
+<p>Did you do?</p>
+<label> <input name="prefer" type="checkbox" value="treking">treking</label>
+<label> <input name="prefer" type="checkbox" value="biking">biking</label>
+<label> <input name="prefer" type="checkbox" value="gaming">gaming</label>
+<label> <input name="prefer" type="checkbox" value="memeing">memeing</label>
+<textarea id="comments"></textarea>
+<button id="submit">
+		</form>
+    </body>
+</html>
+
