@@ -1,0 +1,46 @@
+<html>
+  <head>
+	  <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+<style>
+section{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    align-content: space-around;
+	margin:30px auto 30px auto;
+}
+@media (max-width: 400px){
+header {
+    flex-wrap: wrap;
+}
+}
+nav{
+	float:top;
+}
+</style>
+  <body>
+    <header id="header">
+      <nav id="nav-bar">
+      <img style="float:left;border-radius:50%;max-width:50px;" id="header-img" src="https://www.symbols.com/images/symbol/1/1278_copyleft.png">
+        <a class="nav-link" href="#a-video">a video</a> 
+        <a class="nav-link" href="#a-form">To the form</a>
+		<a class="nav-link" href="#header">Up</a>
+      </nav>
+    </header>
+	<main>
+    <section id="a-video">
+      <video id="video" src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
+    </section>
+    <section id="a-form">
+      <form id="form" action="https://www.freecodecamp.com/email-submit">
+        <input type="email" id="email" placeholder="you@example.com" name="email">
+        <input type="submit" form="form" formaction="https://www.freecodecamp.com/email-submit" id="submit">
+      </form>
+    </section>
+	</main>
+	  <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+  </body>
+</html>
