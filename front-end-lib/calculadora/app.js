@@ -7,7 +7,8 @@ class App extends React.Component{
         let calcButtons=button({text:"=",id:"equals"})
         let calcNumbers=["zero","one","two","three","four","five","six","seven","eight","nine"].map(
         (x,idx)=>button({text:idx,id:x}))
-        return React.createElement("div",{id:"calculadora"},["hola",calcButtons,calcNumbers])
+        let calcOperations=[{symbol:'+',id:"add"},{symbol:'-',id:"subtarct"},{symbol:'*',id:"multiply"},{symbol:'/',id:"divide"},].map((el)=>button({text:el.symbol,id:el.id}));
+        return React.createElement("div",{id:"calculadora"},["hola",calcButtons,calcNumbers,calcOperations])
     }
 }
 const button=(props)=> React.createElement("button",{id:props.id},[props.text])
