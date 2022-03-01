@@ -1,0 +1,11 @@
+#app>div{
+    display: flex;
+    align-content: flex-start;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: stretch;
+}
+#editor,#preview{
+	width:49%;	
+	height:40vmax;
+}
