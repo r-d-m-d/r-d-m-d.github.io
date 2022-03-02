@@ -1,6 +1,6 @@
 const checkZeros=/^[^0.]*[1-9]+\d*\.?\d*$/
 const startsWithZeroes=/^[0]+.*$/
-checkOperation=/^[+\-*/]{1}-?$/
+const checkOperation=/^[+\-*/]{1}-?$/
 class App extends React.Component{
     constructor(props){
         super(props);
@@ -28,11 +28,14 @@ class App extends React.Component{
     }
     inputOperation(event){
         this.setState((oldState)=>{
-            let formula=oldState.formula+oldState.lastNumber;
+            let lastOperation=event.target.innerText!=='-'?
+                event.target.innerText:oldState.lastOperation+event.target.innerText;
+            lastOperation=checkOperation.test(lastOperation)?
+                lastOperation:oldState.lastOperation;
             return{
-                formula,
+                formula: oldState.formula+oldState.lastNumber,
                 lastNumber:'',
-                lastOperation:event.target.innerText,
+                lastOperation,
             }
         })
     }
@@ -65,7 +68,7 @@ class App extends React.Component{
         let clear=button({text:"clear",id:"clear",clear:this.clear,click:this.clear})
         let calcDisplay=display({value:this.state.formula+this.state.lastNumber+this.state.lastOperation})
 
-        return React.createElement("div",{id:"calculadora"},["hola",calcButtons,calcNumbers,calcOperations,clear,calcDisplay])
+        return React.createElement("div",{id:"calculadora"},[calcButtons,calcNumbers,calcOperations,clear,calcDisplay])
     }
 }
 const button=(props)=> React.createElement("button",{id:props.id,value:props.text,onClick:props.click},[props.text])
