@@ -56,7 +56,7 @@ class App extends React.Component{
     })
     }
     render(){
-        let calcButtons=button({text:"=",id:"equals",click:this.equals})
+        let equalsButon=button({text:"=",id:"equals",click:this.equals})
         
         let calcNumbers=["zero","one","two","three","four","five","six","seven","eight","nine"].map(
         (x,idx)=>button({text:idx,id:x,click:this.inputNumber}))
@@ -66,9 +66,10 @@ class App extends React.Component{
         let calcOperations=[{symbol:'+',id:"add"},{symbol:'-',id:"subtract"},{symbol:'*',id:"multiply"},{symbol:'/',id:"divide"},].map((el)=>button({text:el.symbol,id:el.id,click:this.inputOperation}));
 
         let clear=button({text:"clear",id:"clear",clear:this.clear,click:this.clear})
+        let buttonsGrid=React.createElement("div",{id:"grid"},[ calcNumbers,equalsButon,calcOperations,clear])
         let calcDisplay=display({value:this.state.formula+this.state.lastNumber+this.state.lastOperation})
 
-        return React.createElement("div",{id:"calculadora"},[calcButtons,calcNumbers,calcOperations,clear,calcDisplay])
+        return React.createElement("div",{id:"calculadora"},[calcDisplay,buttonsGrid])
     }
 }
 const button=(props)=> React.createElement("button",{id:props.id,value:props.text,onClick:props.click},[props.text])
