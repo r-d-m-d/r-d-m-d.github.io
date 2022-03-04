@@ -1,105 +1,244 @@
-const defaultState={
+const RESET="RESET"
+const SETSESSIONSSECONDS="SETSESSIONSSECONDS"
+const SETBREAKSECONDS="SETBREAKSECONDS"
+const SETSECONDSLEFT="SETSECONDSLEFT"
+const SETPERIODNAME="SETPERIODNAME"
+const SESSION="Session"
+const BREAK="BREAK"
+const CHANGEPERIOD="CHANGEPERIOD"
+const resetAction=()=>({type:RESET})
+const setSessionSecondsAction=(seconds)=>({type:SETSESSIONSSECONDS,seconds})
+const setBreakSecondsAction=(seconds)=>({type:SETBREAKSECONDS,seconds})
+const setSecondsLeftAction=(seconds)=>({type:SETSECONDSLEFT,seconds})
+const setPeriodNameAction=(name)=>({type:SETPERIODNAME,name})
+const changePeriodAction=()=>({type:CHANGEPERIOD})
+const periodReducer=(state={
+    breakSeconds:5*60,
+    sessionSeconds:25*60,
+    secondsLeft:25*60,
+    periodName:SESSION
+},action)=>{
+    switch(action.type){
+        case CHANGEPERIOD:{
+            let secondsLeft=(state.periodName===SESSION)?state.breakSeconds:state.sessionSeconds
+            let periodName=state.periodName===SESSION?BREAK:SESSION
+            return{
+                breakSeconds:state.breakSeconds,
+                sessionSeconds:state.sessionSeconds,
+                secondsLeft,
+                periodName
+            }
+        }
+        case SETPERIODNAME:
+            return {
+                breakSeconds:state.breakSeconds,
+                sessionSeconds:state.sessionSeconds,
+                secondsLeft:state.secondsLeft,
+                periodName:action.name,
+            }
 
-    breakLength:5,
-    sessionLength:25,
+        case SETSESSIONSSECONDS:{
+            let secondsLeft=state.periodName===SESSION?action.seconds:state.secondsLeft;
+            return {
+                breakSeconds:state.breakSeconds,
+                sessionSeconds:action.seconds,
+                secondsLeft,
+                periodName:state.periodName,
+            }
+        }
+        case SETBREAKSECONDS:{
+            let secondsLeft=state.periodName===BREAK?action.seconds:state.secondsLeft;
+            return {
+                breakSeconds:action.seconds,
+                sessionSeconds:state.sessionSeconds,
+                secondsLeft,
+                periodName:state.periodName,
+            }
+        }
+                case SETSECONDSLEFT:
+            return {
+                breakSeconds:state.breakSeconds,
+                sessionSeconds:state.sessionSeconds,
+                secondsLeft:action.seconds,
+                periodName:state.periodName,
+            }
+        case RESET:
+            return{
+    breakSeconds:5*60,
+    sessionSeconds:25*60,
+    secondsLeft:25*60,
+    periodName:SESSION
 }
+        default:
+            return state;
+    }
+}
+const store = Redux.createStore(periodReducer)
+
 //React
+const secondsToMMSS=(seconds)=>{
+    let mm=parseInt(seconds/60);
+    let ss=parseInt(seconds%60);
+    let mmss=mm<10?"0"+mm:""+mm;
+    mmss+=ss<10?":0"+ss:":"+ss;
+    return mmss;
+}
+class Period extends React.Component{
+    constructor(props){
+        super(props);
+        this.state={
+            getSeconds:this.props.getSeconds,
+            seconds:this.props.getSeconds()
+        }
+        this.increment=this.increment.bind(this)
+        this.decrement=this.decrement.bind(this)
+        this.componentDidMount=this.componentDidMount.bind(this)
+    }
+    componentDidMount(){
+        const sub=this.props.subscribe(()=>{
+            this.setState(()=>({seconds:this.props.getSeconds()}))
+        })
+        this.setState(()=>{sub})
+    }
+    componentWillUnmount(){
+        this.state.sub()
+    }
+    increment(){
+        if(this.state.getSeconds()<3600){
+            this.setState((oldState)=>{
+                let seconds=this.state.getSeconds()+60;
+                this.props.setSeconds(seconds)
+                return {seconds}
+            })
+        }
+    }
+    decrement(){
+        if(this.state.seconds>60){
+            this.setState((oldState)=>{
+                let seconds=this.state.getSeconds()-60;
+                this.props.setSeconds(seconds)
+                return {seconds}
+            })           
+        }
+    }
+    render(){
+        let periodLabel=lengthComponent({id:this.props.name+"-label",text:this.props.name})
+        let periodLength=React.createElement("h2",{id:this.props.name+"-length"},[parseInt(this.state.seconds/60)])
+        let periodDec=clickeables({id:this.props.name+"-decrement",text:`${this.props.name} Decrement`,click:this.decrement})
+        let periodInc=clickeables({id:this.props.name+"-increment",text:`${this.props.name} Increment`,click:this.increment})
+        let periodPanel=panel({className:"periodPanel"},[periodLabel,periodLength,periodDec,periodInc]) 
+        return periodPanel;
+    }
+}
+class CountDown extends React.Component{
+    constructor(props){
+        super(props);
+        this.state={
+            secondsLeft:this.props.secondsLeft,
+            start_stop:"start",
+            periodName:this.props.getPeriodName(),
+            audio:undefined
+        }
+        this.reset=this.reset.bind(this);
+        this.startStop=this.startStop.bind(this)
+    }
+    componentWillUnmount(){
+        this.state.desu();
+    }
+
+    componentDidMount(){
+        const desu=this.props.subscribe(()=>{
+            this.setState({secondsLeft:this.props.getSecondsLeft(),periodName:this.props.getPeriodName()})
+        })
+        const audio=document.getElementById("beep")
+        this.setState({audio})
+        this.setState({desu})
+    }
+    startStop(){
+        if(this.state.start_stop==="start"){
+            const interval= setInterval(()=>{
+                if(this.props.getSecondsLeft()===0){
+                    //play audio here
+                    if(this.state.audio)
+                       this.state.audio.play(); 
+                    this.props.changePeriod();
+                }else{
+                    this.props.setSecondsLeft(this.props.getSecondsLeft()-1)
+                }
+                    this.setState({secondsLeft:this.props.getSecondsLeft()})
+            },1000)
+            this.setState({interval})
+        }else{
+            clearInterval(this.state.interval)
+        }
+        this.setState((oldState)=>{{
+          return{
+            start_stop:oldState.start_stop==="start"?"stop":"start"
+          }
+        }})
+    }
+    reset(){
+        this.setState((oldState)=>{
+            this.props.resetAll();
+            clearInterval(this.state.interval)
+            if(this.state.audio){
+                this.state.audio.pause();
+                this.state.audio.load();
+                this.state.audio.currentTime=0;
+            }
+            return {start_stop:"start",secondsLeft:this.props.getSecondsLeft(),periodName:this.props.getPeriodName()}
+        })
+    }
+    render(){
+        let timer=React.createElement("div",{ id:this.props.name+"-label",},[this.state.periodName])
+        let timeLeft=React.createElement("div",{id:"time-left"},[secondsToMMSS(this.props.getSecondsLeft())]);
+        let start=clickeables({id:"start_stop",text:this.state.start_stop,click:this.startStop})
+        let reset=clickeables({id:"reset",click:this.reset,text:"Reset"}) 
+        let audio=React.createElement("audio",{id:"beep",preload:"auto", 
+            src:"https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"})
+        return React.createElement("div",{},[timer,timeLeft,start,reset,audio])
+    }
+}
+
+const breakStateToProps=(store)=>({getSeconds:(state=store.getState())=>state.breakSeconds})
+const sessionStateToProps=(store)=>({getSeconds:(state=store.getState())=>state.sessionSeconds})
+const breakDispatch=(dispatch)=>({setSeconds:(seconds)=>{dispatch(setBreakSecondsAction(seconds))}})
+const sessionDispatch=(dispatch)=>({setSeconds:(seconds)=>{dispatch(setSessionSecondsAction(seconds))}})
+const countDownStateToProps=(store)=>({getSecondsLeft:(state=store.getState())=>state.secondsLeft,
+    getPeriodName:(state=store.getState())=>state.periodName})
+const countDownDispatch=(dispatch)=>({setSecondsLeft:(seconds)=>{dispatch(setSecondsLeftAction(seconds))}
+    ,setPeriodName:(name)=>{dispatch(setPeriodNameAction(name))},resetAll:()=>{dispatch(resetAction())},
+changePeriod:()=>{dispatch(changePeriodAction())}})
 class App extends React.Component{
     constructor(props){
         super(props);
         this.state={
-            breakLength:5*60,
-            sessionLength:25*60,
             interval:NaN,
             start_stop:"start",
-            secondsLeft:0
-        }
-        this.reset=this.reset.bind(this);
-        this.breakDecrement=this.breakDecrement.bind(this)
-        this.breakIncrement=this.breakIncrement.bind(this)
-        this.sessionDecrement=this.sessionDecrement.bind(this);
-        this.sessionIncrement=this.sessionIncrement.bind(this);
-        this.startStop=this.startStop.bind(this)
-    }
-    startStop(){
-        if(this.state.start_stop==="start"){
-            let interval=setInterval(()=>{
-                this.setState((oldState)=>{
-                    let {secondsLeft}=oldState;
-                    console.log(secondsLeft)
-                    secondsLeft--;
-                    return {secondsLeft}
-                })
-            } ,1000)
-            this.setState((oldState)=>({
-                start_stop:oldState.start_stop==="start"?"stop":"start",
-                interval ,
-            }))
-        }else{
-         if(!isNaN(this.state.interval)){
-            clearInterval(this.state.interval)
-        }    
-        this.setState((oldState)=>({
-                interval:NaN,
-                start_stop:oldState.start_stop==="start"?"stop":"start",
-            }))
-        }
-
-    }
-    reset(){
-        if(!isNaN(this.state.interval)){
-            clearInterval(this.state.interval)
+            ...this.props.store.getState(),
         }
     }
-    breakDecrement(){
-        if(this.state.breakLength>1)
-            this.setState((oldState)=>({
-                breakLength:oldState.breakLength-1,
-                interval:oldState.interval,
-            }))
+    componentDidMount(){
+        let sub=this.props.store.subscribe(()=>{
+            this.setState({...this.props.store.getState()})
+        })
+        this.setState(()=>({sub}))
     }
-    breakIncrement(){
-        if(this.state.breakLength<60)
-            this.setState((oldState)=>({
-                breakLength:oldState.breakLength+1,
-            }))
-    }
-   sessionDecrement(){
-       if(this.state.sessionLength>1)
-           this.setState((oldState)=>({
-            sessionLength:oldState.sessionLength-1,
-           }))
-   }
-    sessionIncrement(){
-        if(this.state.sessionLength<60)
-            this.setState((oldState)=>({
-                sessionLength:oldState.sessionLength+1,
-            }))
+    componentWillUnmount(){
+        this.state.sub();
     }
     render(){
-        let breakLabel=lengthComponent({id:"break-label",text:"break"})
-        let breakLength=React.createElement("h2",{id:"break-length"},[this.state.breakLength])
-        let breakDec=clickeables({id:"break-decrement",text:"break dec time",click:this.breakDecrement})
-        let breakInc=clickeables({id:"break-increment",text:"break increment",click:this.breakIncrement})
-        let breakPanel=panel({className:"breakPanel",id:"break-panel"},[breakLabel,breakLength,breakDec,breakInc]) 
-
-        let sessionLabel=lengthComponent({id:"session-label",text:"session"})
-        let sessionLength=React.createElement("h2",{ id:"session-length"},this.state.sessionLength)
-        let sessionInc=clickeables({id:"session-increment",text:"session increment",click:this.sessionIncrement});
-        let sessionDec=clickeables({id:"session-decrement",text:"session dec time",click:this.sessionDecrement})
-        let sessionPanel=panel({className:"sessionPanel",id:"session-panel"},[sessionLabel,sessionLength,sessionInc,sessionDec]);
-
-        let timer=React.createElement("div",{ id:"timer-label",},["session"])
-        let timeLeft=React.createElement("div",{id:"time-left"},[`${this.state.minutesLeft}:${this.state.secondsLeft}`]);
-        let start=clickeables({id:"start_stop",text:this.state.start_stop,click:this.startStop})
-        let reset=clickeables({id:"reset",click:this.reset,text:"Reset"}) 
-
-        return React.createElement("div",{id:"timer-root"},[breakPanel,sessionPanel,timer,timeLeft,start,reset])
+       let breakPanel=React.createElement(Period,{bs:this.state.breakSeconds,name:"break",...breakStateToProps(this.props.store),
+       ...breakDispatch(this.props.store.dispatch),subscribe:this.props.store.subscribe})  
+        let sessionPanel=React.createElement(Period,{name:"session",...sessionStateToProps(this.props.store)
+        ,...sessionDispatch(this.props.store.dispatch),subscribe:this.props.store.subscribe})
+        let countDown=React.createElement(CountDown,{name:"timer",...countDownStateToProps(this.props.store),
+        ...countDownDispatch(this.props.store.dispatch),subscribe:this.props.store.subscribe})
+       return React.createElement("div",{id:"timer-root"},[breakPanel,sessionPanel,countDown])
     }
 }
 const lengthComponent=(props)=> React.createElement("div",{id:props.id},[props.text])
 const clickeables=(props)=>React.createElement("button",{id:props.id,onClick:props.click},[props.text])
 const panel=(props,childs)=>React.createElement("span",{className:props.className,id:props.id},childs)
 const domContainer=document.querySelector("#app");
-ReactDOM.render(React.createElement(App,{}),domContainer);
-
+    ReactDOM.render(React.createElement(App,{store,}),domContainer);
