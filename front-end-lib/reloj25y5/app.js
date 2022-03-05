@@ -86,15 +86,8 @@ const secondsToMMSS = (seconds) => {
 class Period extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-        }
         this.increment = this.increment.bind(this)
         this.decrement = this.decrement.bind(this)
-        this.componentDidMount = this.componentDidMount.bind(this)
-    }
-    componentDidMount() {
-    }
-    componentWillUnmount() {
     }
     increment() {
         if (this.props.seconds < 3600) {
@@ -127,8 +120,6 @@ class CountDown extends React.Component {
         this.reset = this.reset.bind(this);
         this.startStop = this.startStop.bind(this)
     }
-    componentWillUnmount() {
-    }
     componentDidMount() {
         const audio = document.getElementById("beep")
         this.setState({audio})
@@ -137,29 +128,23 @@ class CountDown extends React.Component {
         if (this.state.start_stop === "start") {
             const interval = setInterval(() => {
                 if (this.props.secondsLeft === 0) {
-                    //play audio here
                     if (this.state.audio)
                         this.state.audio.play();
                     this.props.changePeriod();
                 } else {
                     this.props.setSecondsLeft(this.props.secondsLeft - 1)
                 }
-                //                this.setState({secondsLeft: this.props.secondsLeft})
-            }, 1000)
-            this.setState({interval})
+            }, 1000);
+            this.setState({interval});
         } else {
             clearInterval(this.state.interval)
         }
-        this.setState((oldState) => {
-            {
-                return {
-                    start_stop: oldState.start_stop === "start" ? "stop" : "start"
-                }
-            }
-        })
+        this.setState((oldState) => ({
+            start_stop: oldState.start_stop === "start" ? "stop" : "start"
+        }));
     }
     reset() {
-        this.setState((oldState) => {
+        this.setState(() => {
             this.props.resetAll();
             clearInterval(this.state.interval)
             if (this.state.audio) {
@@ -200,8 +185,6 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            interval: NaN,
-            start_stop: "start",
             ...this.props.store.getState(),
         }
     }
@@ -216,7 +199,7 @@ class App extends React.Component {
     }
     render() {
         let breakPanel = React.createElement(Period, {
-            bs: this.state.breakSeconds, name: "break", ...breakStateToProps(this.state),
+            name: "break", ...breakStateToProps(this.state),
             ...breakDispatch(this.props.store.dispatch)
         })
         let sessionPanel = React.createElement(Period, {
