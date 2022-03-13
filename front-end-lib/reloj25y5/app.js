@@ -102,6 +102,7 @@ class Period extends React.Component {
         }
     }
     render() {
+        console.log("Period->render", this.props.name)
         let periodLabel = lengthComponent({id: this.props.name + "-label", text: this.props.name})
         let periodLength = React.createElement("h2", {id: this.props.name + "-length"}, [parseInt(this.props.seconds / 60)])
         let periodDec = clickeables({id: this.props.name + "-decrement", text: `${this.props.name} Decrement`, click: this.decrement})
@@ -156,6 +157,7 @@ class CountDown extends React.Component {
         })
     }
     render() {
+        console.log("countDown->render", this.props.name)
         let timer = React.createElement("div", {id: this.props.name + "-label", }, [this.props.periodName])
         let timeLeft = React.createElement("div", {id: "time-left"}, [secondsToMMSS(this.props.secondsLeft)]);
         let start = clickeables({id: "start_stop", text: this.state.start_stop, click: this.startStop})
@@ -198,6 +200,7 @@ class App extends React.Component {
         this.state.sub();
     }
     render() {
+        console.log("App->render")
         let breakPanel = React.createElement(Period, {
             name: "break", ...breakStateToProps(this.state),
             ...breakDispatch(this.props.store.dispatch)
