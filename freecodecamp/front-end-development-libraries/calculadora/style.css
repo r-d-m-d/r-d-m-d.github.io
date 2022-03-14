@@ -1,6 +1,6 @@
 #app{
-	display:flex;
-	flex-direction:column;
+	display:grid;
+	justify-content:center;
 }
 #display{
 	width:100%;

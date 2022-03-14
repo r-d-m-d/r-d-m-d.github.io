@@ -1,0 +1,8 @@
+form{
+	display:grid;
+    align-content: stretch;
+    justify-content: center;
+}
+#identification{
+	display:auto;
+}

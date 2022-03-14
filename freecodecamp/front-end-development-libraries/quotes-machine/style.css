@@ -1,0 +1,7 @@
+body{
+display: grid;
+    justify-content: space-around
+}
+#quote-box{
+	text-align:center;
+}
