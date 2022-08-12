@@ -6,17 +6,17 @@
         <link rel="stylesheet" href="survey-style.css">
     </head>
     <body>
-		<h1 id="title">Una encuesta</h1>
-		<p id="description">Entre varias opciones,¿Que eligen los participantes?</p>
+		<h1 id="title">A survey</h1>
+		<p id="description">Choose between options</p>
 		<form id="survey-form">
-			<label for="name" id="name-label">Nombre</label>
-			<input type="text" id="name" placeholder="el nombre" required>
+			<label for="name" id="name-label">Name</label>
+			<input type="text" id="name" placeholder="your name" required>
 			<label for="email" id="email-label">Email</label>
-			<input type="email" id="email" placeholder="El email" required>
-			<label id="number-label" for="number">Numero</label>
+			<input type="email" id="email" placeholder="yout e-mail" required>
+			<label id="number-label" for="number">Number</label>
 			<input style="min-width:11em" type="number" id="number" max=1000 min=300 placeholder="min:300 max:1000" required>
 			<select id="dropdown" name="role" required>
-				<option disabled selected value>Seleccionar algo</option>
+				<option disabled selected value>Just choose one</option>
 				<option value="una" >una</option>
 				<option value="ana">ana</option>
 				<option value="bna">bna</option>
@@ -26,18 +26,20 @@
 				<option value="fna">fna</option>
 				<option value="gna">gna</option>
 			</select>
+      <p>A blood type(not your's)</p>
 			<label> <input name="blood-type" value="A" type="radio" checked>A+</label>
 <label> <input name="blood-type" value="B" type="radio">B+</label>
 <label> <input name="blood-type" value="AB" type="radio">AB</label>
 <label> <input name="blood-type" value="O" type="radio">O</label>
 <br>
-<p>Did you do?</p>
+<p>You do...</p>
 <label> <input name="prefer" type="checkbox" value="treking">Treking</label>
 <label> <input name="prefer" type="checkbox" value="biking">Biking</label>
 <label> <input name="prefer" type="checkbox" value="gaming">Gaming</label>
 <label> <input name="prefer" type="checkbox" value="memeing">Memeing</label>
-<textarea id="comments"placeholder="comentarios"></textarea>
-<button id="submit">Enviar</button>
+<p>Tell us something</p>
+<textarea id="comments"placeholder="comments"></textarea>
+<button id="submit">Send</button>
 		</form>
     </body>
 </html>
